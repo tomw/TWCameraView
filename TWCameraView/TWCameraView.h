@@ -1,5 +1,5 @@
 //
-//  SwiftySunrise.swift
+//  TWCameraView.h
 //
 //  Copyright (c) 2016 Tom Weightman
 //
