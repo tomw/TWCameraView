@@ -6,6 +6,8 @@ A simple & easy-to-use iOS camera wrapper, written in Swift 3. Currently support
 
 There's often a lot of boilerplate code required when building a custom camera in iOS. For example, dealing with orientation when taking photos using `AVCaptureSession`, `AVCapturePhotoOutput` and `AVCaptureVideoPreviewLayer` can be painful. This framework aims to do the work for you.
 
+To help simplify the interface, this framework presumes the device has both a front and back camera.
+
 ## Usage
 
 First, import TWCameraView:
@@ -36,6 +38,18 @@ cameraView.capturePhoto(imageStabilization: true, flashMode: .off)
 ```
 
 The delegate callback function `cameraViewDidCaptureImage(image: UIImage, cameraView: TWCameraView)` will be called with the output UIImage.
+
+### Front or back camera?
+
+TWCameraView supports either camera, but default to back. Just set the `cameraType` setting:
+
+```
+self.cameraView?.cameraType = .front
+```
+or
+```
+self.cameraView?.cameraType = .back
+```
 
 ## Licence
 The MIT License (MIT)
