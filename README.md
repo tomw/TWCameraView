@@ -12,13 +12,13 @@ To help simplify the interface, this framework presumes the device has both a fr
 
 First, import TWCameraView:
 
-```
+```swift
 import TWCameraView
 ```
 
 Next, initialise the view, set the delegate, and start the preview:
 
-```
+```swift
 let cameraView = TWCameraView()
 cameraView.delegate = self
 self.view.addSubview(cameraView)
@@ -29,11 +29,11 @@ Setting the `requestPermissionIfNeeded` flag automatically asks the user for cam
 
 To take a photo, just call `capturePhoto()`:
 
-```
+```swift
 cameraView.capturePhoto()
 ```
 or
-```
+```swift
 cameraView.capturePhoto(imageStabilization: true, flashMode: .off)
 ```
 
@@ -43,11 +43,11 @@ The delegate callback function `cameraViewDidCaptureImage(image: UIImage, camera
 
 TWCameraView supports either camera, but default to back. Just set the `cameraType` setting:
 
-```
+```swift
 self.cameraView?.cameraType = .front
 ```
 or
-```
+```swift
 self.cameraView?.cameraType = .back
 ```
 
