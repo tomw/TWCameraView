@@ -42,6 +42,16 @@ public class TWCameraView: UIView {
     //MARK: Public vars
     public weak var delegate: TWCameraViewDelegate?
     
+    public var focusPoint = CGPoint(x: 0.5, y: 0.5) {
+        
+        didSet {
+            
+            updateForFocusPoint()
+            
+        }
+        
+    }
+    
     public var cameraType: CameraType = .back {
         
         didSet {
@@ -130,6 +140,7 @@ public class TWCameraView: UIView {
         self.captureSession = AVCaptureSession()
         self.captureSession?.sessionPreset = AVCaptureSessionPresetPhoto
         updateForCameraType()
+        updateForFocusPoint()
         
         //Photo output
         self.photoOutput = AVCapturePhotoOutput()
@@ -170,6 +181,13 @@ public class TWCameraView: UIView {
             self.captureSession?.addInput(backCameraDeviceInput)
             
         }
+        
+    }
+    
+    private func updateForFocusPoint() {
+        
+        self.frontCameraDeviceInput?.device.focusPointOfInterest = self.focusPoint
+        self.backCameraDeviceInput?.device.focusPointOfInterest = self.focusPoint
         
     }
     
