@@ -46,7 +46,7 @@ public class TWCameraView: UIView {
         
         didSet {
             
-            updateForFocusPoint()
+            try? updateForFocusPoint()
             
         }
         
@@ -140,7 +140,7 @@ public class TWCameraView: UIView {
         self.captureSession = AVCaptureSession()
         self.captureSession?.sessionPreset = AVCaptureSessionPresetPhoto
         updateForCameraType()
-        updateForFocusPoint()
+        try? updateForFocusPoint()
         
         //Photo output
         self.photoOutput = AVCapturePhotoOutput()
@@ -184,10 +184,24 @@ public class TWCameraView: UIView {
         
     }
     
-    private func updateForFocusPoint() {
+    private func updateForFocusPoint() throws {
         
-        self.frontCameraDeviceInput?.device.focusPointOfInterest = self.focusPoint
-        self.backCameraDeviceInput?.device.focusPointOfInterest = self.focusPoint
+        guard let frontCameraDeviceInput = self.frontCameraDeviceInput else { return }
+        guard let backCameraDeviceInput = self.backCameraDeviceInput else { return }
+        
+        try frontCameraDeviceInput.device.lockForConfiguration()
+        try backCameraDeviceInput.device.lockForConfiguration()
+        
+        if frontCameraDeviceInput.device.isFocusPointOfInterestSupported {
+            frontCameraDeviceInput.device.focusPointOfInterest = self.focusPoint
+        }
+        
+        if backCameraDeviceInput.device.isFocusPointOfInterestSupported {
+            backCameraDeviceInput.device.focusPointOfInterest = self.focusPoint
+        }
+        
+        frontCameraDeviceInput.device.unlockForConfiguration()
+        backCameraDeviceInput.device.unlockForConfiguration()
         
     }
     
@@ -282,7 +296,7 @@ extension TWCameraView: AVCapturePhotoCaptureDelegate {
         let imageOrientation: UIImageOrientation
         switch captureOrientation {
         case .portrait:
-                imageOrientation = .right
+            imageOrientation = .right
         case .portraitUpsideDown:
             imageOrientation = .left
         case .landscapeLeft:
