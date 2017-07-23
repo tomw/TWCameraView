@@ -245,7 +245,11 @@ public class TWCameraView: UIView {
         guard let photoOutput = self.photoOutput else { return }
         
         let captureSettings = AVCapturePhotoSettings(format: [ AVVideoCodecKey : AVVideoCodecJPEG ])
-        captureSettings.flashMode = flashMode
+        
+        if let position = self.backCameraDeviceInput?.device.position, position == .back {
+            captureSettings.flashMode = flashMode
+        }
+        
         captureSettings.isAutoStillImageStabilizationEnabled = imageStabilization
         captureSettings.isHighResolutionPhotoEnabled = true
         
