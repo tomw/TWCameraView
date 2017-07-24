@@ -26,19 +26,27 @@ import Foundation
 import UIKit
 import AVFoundation
 
+//MARK: Types
+public enum CameraType: Hashable  {
+    case front
+    case back
+    
+    public var hashValue: Int {
+        switch self{
+        case .front:
+            return 0
+        case .back:
+            return 1
+        }
+    }
+}
+
 public protocol TWCameraViewDelegate: class {
     func cameraViewDidCaptureImage(image: UIImage, cameraView: TWCameraView)
     func cameraViewDidFailToCaptureImage(error: Error, cameraView: TWCameraView)
 }
 
 public class TWCameraView: UIView {
-    
-    //MARK: Types
-    public enum CameraType {
-        case front
-        case back
-    }
-    
     //MARK: Public vars
     public weak var delegate: TWCameraViewDelegate?
     
@@ -245,9 +253,10 @@ public class TWCameraView: UIView {
         guard let photoOutput = self.photoOutput else { return }
         
         let captureSettings = AVCapturePhotoSettings(format: [ AVVideoCodecKey : AVVideoCodecJPEG ])
-        
-        if let position = self.backCameraDeviceInput?.device.position, position == .back {
-            captureSettings.flashMode = flashMode
+        if let position = self.backCameraDeviceInput?.device.position {
+            if position == .back {
+                captureSettings.flashMode = flashMode
+            }
         }
         
         captureSettings.isAutoStillImageStabilizationEnabled = imageStabilization
@@ -315,4 +324,9 @@ extension TWCameraView: AVCapturePhotoCaptureDelegate {
         
     }
     
+}
+//Make CameraType Equatable
+extension CameraType: Equatable {}
+public func ==(lhs:CameraType, rhs:CameraType) -> Bool{
+    return lhs.hashValue == rhs.hashValue
 }
