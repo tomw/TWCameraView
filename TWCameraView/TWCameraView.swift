@@ -34,9 +34,15 @@ public protocol TWCameraViewDelegate: class {
 public class TWCameraView: UIView {
     
     //MARK: Types
-    public enum CameraType {
-        case front
-        case back
+    public enum CameraType: String, Hashable, Equatable {
+        
+        case front = "front"
+        case back = "back"
+        
+        public var hashValue: Int {
+            return self.rawValue.hashValue
+        }
+        
     }
     
     //MARK: Public vars
@@ -246,7 +252,7 @@ public class TWCameraView: UIView {
         
         let captureSettings = AVCapturePhotoSettings(format: [ AVVideoCodecKey : AVVideoCodecJPEG ])
         
-        if let position = self.backCameraDeviceInput?.device.position, position == .back {
+        if (self.cameraType == .back) {
             captureSettings.flashMode = flashMode
         }
         
