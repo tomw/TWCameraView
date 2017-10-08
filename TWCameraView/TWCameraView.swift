@@ -71,7 +71,7 @@ public class TWCameraView: UIView {
     }
     
     public var authorizedForCapture: Bool {
-        return AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo) == .authorized
+        return AVCaptureDevice.authorizationStatus(for: AVMediaType.video) == .authorized
     }
     
     //MARK: Camera capture
@@ -109,17 +109,17 @@ public class TWCameraView: UIView {
             cameraPreviewLayer.frame = self.bounds
             
             //Set orientation on connection
-            if (cameraPreviewLayer.connection.isVideoOrientationSupported) {
+            if (cameraPreviewLayer.connection?.isVideoOrientationSupported)! {
                 
                 switch UIDevice.current.orientation {
                 case .portrait, .portraitUpsideDown:
-                    cameraPreviewLayer.connection.videoOrientation = .portrait
+                    cameraPreviewLayer.connection?.videoOrientation = .portrait
                 case .landscapeRight:
-                    cameraPreviewLayer.connection.videoOrientation = .landscapeLeft
+                    cameraPreviewLayer.connection?.videoOrientation = .landscapeLeft
                 case .landscapeLeft:
-                    cameraPreviewLayer.connection.videoOrientation = .landscapeRight
+                    cameraPreviewLayer.connection?.videoOrientation = .landscapeRight
                 default:
-                    cameraPreviewLayer.connection.videoOrientation = .portrait
+                    cameraPreviewLayer.connection?.videoOrientation = .portrait
                 }
                 
             }
@@ -133,8 +133,8 @@ public class TWCameraView: UIView {
     private func setupCaptureSession() {
         
         //Camera devices
-        guard let frontCameraDevice = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .front) else { return }
-        guard let backCameraDevice = AVCaptureDevice.defaultDevice(withDeviceType: .builtInWideAngleCamera, mediaType: AVMediaTypeVideo, position: .back) else { return }
+        guard let frontCameraDevice = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: AVMediaType.video, position: .front) else { return }
+        guard let backCameraDevice = AVCaptureDevice.default(AVCaptureDevice.DeviceType.builtInWideAngleCamera, for: AVMediaType.video, position: .back) else { return }
         
         guard let frontCameraDeviceInput = try? AVCaptureDeviceInput(device: frontCameraDevice) else { return }
         guard let backCameraDeviceInput = try? AVCaptureDeviceInput(device: backCameraDevice) else { return }
@@ -144,7 +144,7 @@ public class TWCameraView: UIView {
         
         //Capture session
         self.captureSession = AVCaptureSession()
-        self.captureSession?.sessionPreset = AVCaptureSessionPresetPhoto
+        self.captureSession?.sessionPreset = AVCaptureSession.Preset.photo
         updateForCameraType()
         try? updateForFocusPoint()
         
@@ -155,7 +155,7 @@ public class TWCameraView: UIView {
         
         //UI
         self.cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession!)
-        self.cameraPreviewLayer?.videoGravity = AVLayerVideoGravityResizeAspect
+        self.cameraPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspect
         self.cameraPreviewLayer?.frame = self.bounds
         self.layer.addSublayer(self.cameraPreviewLayer!)
         
@@ -246,7 +246,7 @@ public class TWCameraView: UIView {
         
     }
     
-    public func capturePhoto(imageStabilization: Bool = true, flashMode: AVCaptureFlashMode = .auto) {
+    public func capturePhoto(imageStabilization: Bool = true, flashMode: AVCaptureDevice.FlashMode = .auto) {
         
         guard let photoOutput = self.photoOutput else { return }
         
@@ -270,7 +270,7 @@ fileprivate extension TWCameraView {
     
     fileprivate func requestCapturePermission(completion: @escaping (_ granted: Bool) -> Void) {
         
-        AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo) { permissionGranted in
+        AVCaptureDevice.requestAccess(for: AVMediaType.video) { permissionGranted in
             
             //Call completion back on main thread
             DispatchQueue.main.async {
@@ -289,7 +289,7 @@ fileprivate extension TWCameraView {
 
 extension TWCameraView: AVCapturePhotoCaptureDelegate {
     
-    public func capture(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhotoSampleBuffer photoSampleBuffer: CMSampleBuffer?, previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
+    public func photoOutput(_ captureOutput: AVCapturePhotoOutput, didFinishProcessingPhoto photoSampleBuffer: CMSampleBuffer?, previewPhoto previewPhotoSampleBuffer: CMSampleBuffer?, resolvedSettings: AVCaptureResolvedPhotoSettings, bracketSettings: AVCaptureBracketedStillImageSettings?, error: Error?) {
         
         if let error = error {
             self.delegate?.cameraViewDidFailToCaptureImage(error: error, cameraView: self)
@@ -302,7 +302,7 @@ extension TWCameraView: AVCapturePhotoCaptureDelegate {
         guard let cgImage = CGImage(jpegDataProviderSource: jpegDataProvider, decode: nil, shouldInterpolate: true, intent: CGColorRenderingIntent.absoluteColorimetric) else { return }
         
         //Based on the orientation we set for the video capture, select the appropriate image orientation for output
-        guard let captureOrientation = self.cameraPreviewLayer?.connection.videoOrientation else { return }
+        guard let captureOrientation = self.cameraPreviewLayer?.connection?.videoOrientation else { return }
         let imageOrientation: UIImageOrientation
         switch captureOrientation {
         case .portrait:
